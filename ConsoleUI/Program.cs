@@ -26,7 +26,7 @@ namespace ConsoleUI
         private static void ProductTest()
         {
             ProductManager productManager = new ProductManager(new EfProductDal());
-            Console.WriteLine("Foreach Başladı... ");
+            Console.WriteLine("Foreach Başladı... \n");
             var result = productManager.GetProductDetails();
             if (result.Success)
             {
@@ -42,7 +42,7 @@ namespace ConsoleUI
 
             
 
-            Console.WriteLine("Foreach Bitti !");
+            Console.WriteLine("Foreach Bitti ! \n");
         }
     }
 }
