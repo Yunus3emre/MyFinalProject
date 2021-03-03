@@ -2,6 +2,7 @@
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValitation;
+using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
@@ -29,6 +30,7 @@ namespace Business.Concrete
             _productDal = productDal;
             _categoryService = categoryService;
         }
+        [CacheRemoveAspect("IProductService.Get")]
         [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
@@ -46,6 +48,7 @@ namespace Business.Concrete
             return new SuccesResult(Messages.ProductAdded);
         }
 
+        [CacheAspect]
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 6)
@@ -60,6 +63,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id));
         }
 
+        [CacheAspect]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
@@ -75,6 +79,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails());
         }
 
+        [CacheRemoveAspect("IProductService.Get")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Update(Product product)
         {
@@ -101,11 +106,16 @@ namespace Business.Concrete
         private IResult CheckIfCategoryLimitExceded()
         {
             var result = _categoryService.GetAll();
-            if (result.Data.Count>15)
+            if (result.Data.Count > 15)
             {
                 return new ErrorResult(Messages.CategoryLimitExceded);
             }
             return new SuccesResult();
+        }
+
+        public IResult AddTransactionalTest(Product product)
+        {
+            throw new NotImplementedException();
         }
     }
 }
